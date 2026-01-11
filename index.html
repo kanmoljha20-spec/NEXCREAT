@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YouTube Creator Award Checker</title>
+<style>
+
+header{background:#fff;padding:16px 28px;border-bottom:1px solid #e0e0e0;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;}
+header strong{font-size:18px;display:flex;align-items:center;}
+header strong img{
+  width:28px;
+  margin-right:6px;
+  vertical-align: middle;
+}
+nav a{margin-left:18px;text-decoration:none;color:#1a73e8;font-weight:500;cursor:pointer;}
+section{display:none;max-width:1100px;margin:auto;padding:40px 24px;}
+section.active{display:block;}
+h1,h2,h3{margin-top:24px;margin-bottom:12px;}
+.hero{font-size:32px;font-weight:600;margin-bottom:16px;}
+.sub{font-size:16px;color:#5f6368;margin-bottom:24px;}
+.button{margin-top:16px;display:inline-block;background:#1a73e8;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;cursor:pointer;}
+input{width:100%;padding:14px;font-size:16px;border-radius:6px;border:1px solid #dadce0;margin-top:10px;}
+button{margin-top:14px;padding:14px 26px;background:#1a73e8;color:#fff;border:none;border-radius:6px;font-size:16px;cursor:pointer;}
+.result{display:none;margin-top:24px;background:#fff;padding:20px;border-radius:12px;box-shadow:0 6px 22px rgba(0,0,0,.06);}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-top:20px;}
+.stat{background:#f1f3f4;padding:14px;border-radius:8px;text-align:center;font-weight:500;}
+img.button-img{width:120px;margin-top:16px;}
+img.channel-logo{width:80px;height:80px;border-radius:50%;margin-top:12px;object-fit:cover;}
+.clickable-video{width:100%;max-width:480px;cursor:pointer;border-radius:12px;margin-bottom:30px;transition:transform 0.2s;}
+.clickable-video:hover{transform:scale(1.05);}
+.thumbnails-row{display:flex;flex-wrap:wrap;gap:16px;margin-bottom:30px;}
+.message-text{font-size:20px;font-weight:600;margin-top:20px;color:#1a73e8;}
+.reason-text{font-size:16px;color:#d93025;margin-top:8px;}
+ul{margin:10px 0 20px 20px;}
+footer{text-align:center;padding:24px;font-size:13px;color:#5f6368;margin-top:40px;border-top:none}
+
+/* Question text styling */
+.question p {
+  font-weight: 700;      /* Bold */
+  font-size: 18px;       /* Thoda bada */
+  color: #1a73e8;        /* Blue */
+  margin-bottom: 10px;   /* Thoda gap niche */
+}
+
+/* Yes/No box styling */
+.question label {
+  display: inline-block;
+  padding: 10px 20px;
+  margin-right: 12px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.question input[value="yes"] + span {
+  background-color: #d4edda; /* light green */
+  color: #155724;
+}
+
+.question input[value="no"] + span {
+  background-color: #f8d7da; /* light red */
+  color: #721c24;
+}
+
+.question label:hover span {
+  filter: brightness(0.9);
+}
+
+button {
+  background-color: #1a73e8; /* blue */
+  color: white;
+  font-size: 16px;
+  padding: 14px 28px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 20px;
+}
+
+button:hover {
+  background-color: #1558b0; /* dark blue hover */
+}
+
+/* Questions black & bold */
+.question p {
+    color: #000;
+    font-weight: bold;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+/* Options: thoda bada box with curve */
+.question label {
+    display: inline-block;
+    margin-right: 12px;
+    margin-bottom: 10px;
+}
+
+/* Hide default radio button */
+.question input[type="radio"] {
+    display: none;
+}
+
+/* Add span inside label for box styling */
+.question label span {
+    display: inline-block;
+    padding: 12px 28px;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background-color: #f8f8f8;
+}
+
+/* Checked = green box */
+.question input[type="radio"]:checked + span {
+    background-color: #4caf50;
+    color: #fff;
+    border-color: #4caf50;
+}
+
+.subtitle {
+  font-weight: bold;
+  white-space: nowrap;   /* 🔥 ye main fix hai */
+  margin-top: 2px;
+}
+
+body{
+  margin:0;
+  font-family:Roboto, Arial, sans-serif;
+  color:#202124;
+  line-height:1.6;
+
+  background-image: url("https://static.vecteezy.com/system/resources/thumbnails/072/567/978/small/sky-summer-sunset-background-with-nature-light-and-clouds-on-colorful-yellow-orange-and-blue-fantasy-twilight-sky-beautiful-horizon-romantic-dusk-sky-in-the-evening-free-photo.jpg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  background-attachment: fixed;
+}
+section{
+  background: rgba(255,255,255,0.92);
+  border-radius: 16px;
+  margin-top: 30px;
+}
+/* HEADER STYLES */
+
+header .header-logo {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%; /* circular logo */
+  object-fit: cover;
+}
+
+header .header-title {
+  font-size: 18px;
+  color: #000; /* black text */
+  font-weight: bold;
+}
+
+header nav.top-nav {
+  margin-left: auto;
+}
+
+header nav.top-nav a {
+  margin-left: 18px;
+  text-decoration: none;
+  color: #1a73e8; /* blue links */
+  font-weight: 500;
+  cursor: pointer;
+}
+
+header .header-title {
+  font-size: 18px;
+  color: #000;
+  font-weight: bold;
+  background: none;  /* No rectangle */
+  padding: 0;
+  margin-left: 6px;  /* thoda gap logo ke liye */
+  display: inline-flex;
+  align-items: center;
+}
+ footer {
+  color: #000; /* black text */
+}
+
+/* ===== WELCOME PAGE ===== */
+
+.welcome-section{
+  text-align:center;
+  margin-top:120px;
+  color:#fff;
+  position: relative;   /* 🔥 THIS FIXES LEFT ISSUE */
+}
+
+.welcome-section h1{
+  font-size:48px;
+  font-weight:600;
+  margin-bottom:10px;
+}
+
+.welcome-section p{
+  font-size:18px;
+  opacity:0.95;
+  margin-bottom:30px;
+}
+
+.welcome-btn{
+  display:inline-block;
+  background:#1a73e8;
+  color:#fff;
+  padding:14px 36px;
+  border-radius:6px;
+  text-decoration:none;
+  font-size:16px;
+  font-weight:500;
+}
+.no-white{
+  background: transparent !important;
+}
+#welcome + footer{
+  border-top:none;
+}
+
+/* Hide footer only on Welcome page */
+body.welcome-active footer{
+  display: none;
+}
+/* Container wraps both boxes */
+.welcome-box-container {
+  display: flex;
+  gap: 30px; /* space between left & right */
+  margin-top: 40px;
+}
+
+/* Individual white boxes */
+.welcome-box {
+  flex: 1;
+  background: #fff;
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  color: #000;
+  font-size: 16px;
+  line-height: 1.6;
+}
+/* Welcome page header fix */
+body.welcome-active .site-header {
+  background: transparent !important; /* white background remove */
+  border-bottom: none !important;     /* bottom line remove */
+  position: absolute;                  /* background image ke upar */
+  top: 20px;
+  left: 20px;
+  width: auto;
+  padding: 0;
+}
+
+/* Hide navigation links only on welcome page */
+body.welcome-active .site-header nav.top-nav {
+  display: none !important;
+}
+
+/* Logo + text adjustment */
+body.welcome-active .site-header img.header-logo,
+body.welcome-active .site-header .header-title {
+  position: relative;   /* relative inside absolute header */
+  top: 0;
+  left: 0;
+  margin: 0 10px 0 0;
+  background: none;
+  color: #fff;          /* white text on bg image */
+}
+
+/* Welcome page text styling */
+body.welcome-active h1,
+body.welcome-active .header-title {
+    color: #000 !important;       /* black text */
+    font-weight: bold !important; /* bold text */
+}
+ 
+/* Welcome page paragraphs animation */
+body.welcome-active .welcome-left p,
+body.welcome-active .welcome-right p {
+  opacity: 0;                /* initial invisible */
+  transform: translateY(20px); /* thoda neeche se start */
+  animation: fadeSlideUp 1s ease forwards; /* animation apply */
+}
+
+/* Delay for right paragraph */
+body.welcome-active .welcome-right p {
+  animation-delay: 0.5s; /* right paragraph thoda baad me aayega */
+}
+
+/* Keyframes */
+@keyframes fadeSlideUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+section{
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.5s ease;
+  display: none;
+}
+
+section.active{
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+/* Page Turn Animation */
+section{
+  display: none;
+  transform-origin: left center;
+  backface-visibility: hidden;
+}
+
+section.active{
+  display: block;
+}
+
+/* Exit animation */
+.page-exit{
+  animation: pageTurnOut 0.6s ease forwards;
+}
+
+/* Enter animation */
+.page-enter{
+  animation: pageTurnIn 0.6s ease forwards;
+}
+
+@keyframes pageTurnOut{
+  from{
+    transform: rotateY(0deg);
+    opacity: 1;
+  }
+  to{
+    transform: rotateY(-90deg);
+    opacity: 0;
+  }
+}
+
+@keyframes pageTurnIn{
+  from{
+    transform: rotateY(90deg);
+    opacity: 0;
+  }
+  to{
+    transform: rotateY(0deg);
+    opacity: 1;
+  }
+}
+/* Welcome paragraph animation */
+.welcome-box{
+  animation: fadeUp 0.8s ease forwards;
+  opacity: 0;
+}
+
+.welcome-left-box{
+  animation-delay: 0.2s;
+}
+
+.welcome-right-box{
+  animation-delay: 0.5s;
+}
+
+@keyframes fadeUp{
+  from{
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to{
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+.page {
+  min-height: 100vh;
+  padding: 40px 16px;
+  box-sizing: border-box;
+}
+
+.about-wrap {
+  max-width: 900px;
+  margin: auto;
+}
+
+.about-highlight {
+  font-weight: 600;
+}
+.policy-page button{
+  margin-top:20px;
+  padding:10px 15px;
+}
+.footer-links a{
+  color:#0066ff;
+  font-weight:500;
+  text-decoration:underline;
+}
+.info-top {
+  margin-bottom: 24px;
+}
+
+.info-row {
+  display: flex;
+  align-items: flex-start; /* top align image & paragraph */
+  gap: 20px;               /* space between text & image */
+}
+
+.info-image {
+  width: 300px;        /* image size adjust */
+  height: auto;
+  border-radius: 12px;
+  flex-shrink: 0;      /* image size fixed, text shrinks if needed */
+}
+
+.info-row p {
+  flex: 1;             /* paragraph takes remaining space */
+  font-size: 16px;
+  line-height: 1.6;
+}
+.image-crop-right {
+  width: 300px;           /* image width adjust karo as per paragraph */
+  height: 200px;          /* height adjust karo jahan se crop karna hai */
+  overflow: hidden;       /* crop ke liye */
+  float: right;           /* paragraph ke samne right side pe rakhe */
+  margin-left: 20px;      /* thoda gap paragraph se */
+  margin-bottom: 20px;    /* optional spacing */
+}
+
+.image-crop-right img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;       /* crop aur fit dono */
+  object-position: top;    /* upar se dikhe, niche crop ho jaaye */
+}
+#mobile-warning {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #ffffff; /* white bg */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    text-align: center;
+    padding: 5vw; /* responsive padding */
+    box-sizing: border-box;
+}
+
+#mobile-warning img {
+    width: 35vw;         /* responsive image width */
+    max-width: 150px;    /* image won't be too big */
+    height: auto;
+    margin-bottom: 4vw;  /* responsive spacing below image */
+}
+
+#mobile-warning h1 {
+    font-size: 8vw;       /* responsive heading */
+    max-font-size: 36px;  /* optional, prevent too big on tablets */
+    color: #000000;       /* black text */
+    margin-bottom: 2vw;   /* space below heading */
+}
+
+#mobile-warning p {
+    font-size: 4.5vw;     /* responsive paragraph */
+    max-width: 90%;       /* fits within screen */
+    color: #000000;       /* black text */
+    line-height: 1.5;
+}
+.creator-help-contact {
+  margin: 50px auto 30px;
+  padding: 24px 28px;
+  max-width: 900px;
+  background: rgba(0, 0, 0, 0.65);
+  border-radius: 14px;
+  color: #fff;
+  text-align: center;
+}
+
+.creator-help-contact h3 {
+  margin-bottom: 12px;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.creator-help-contact p {
+  font-size: 15px;
+  line-height: 1.6;
+  margin-bottom: 14px;
+}
+
+.contact-details p {
+  margin: 6px 0;
+  font-size: 14px;
+  opacity: 0.95;
+}
+/* Hide mobile warning by default to prevent flash */
+#mobile-warning {
+  display: none;
+}
+/* ===== PRIVACY PAGE STYLING ===== */
+
+#privacy {
+  max-width: 1000px;
+  margin: 60px auto;
+  padding: 48px 42px;
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+}
+
+/* Main heading */
+#privacy h2 {
+  font-size: 34px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #1a73e8;
+}
+
+/* Sub headings */
+#privacy h3 {
+  font-size: 20px;
+  font-weight: 600;
+  margin-top: 32px;
+  margin-bottom: 10px;
+  color: #202124;
+}
+
+/* Paragraphs */
+#privacy p {
+  font-size: 16px;
+  line-height: 1.75;
+  color: #444;
+  margin-bottom: 14px;
+}
+
+/* Lists */
+#privacy ul {
+  margin: 12px 0 22px 22px;
+}
+
+#privacy li {
+  margin-bottom: 8px;
+  font-size: 15px;
+  color: #333;
+}
+
+/* Highlight box (optional) */
+.privacy-note {
+  margin-top: 28px;
+  padding: 18px 22px;
+  background: #f1f6ff;
+  border-left: 4px solid #1a73e8;
+  border-radius: 8px;
+  font-size: 15px;
+  color: #1a1a1a;
+}
+
+/* Smooth page entry animation */
+#privacy {
+  animation: privacyFade 0.6s ease;
+}
+
+@keyframes privacyFade {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+</style>
+</head>
+<body>
+<!-- MOBILE WARNING (Only for Phones/Tablets) -->
+<div id="mobile-warning">
+  <img src="https://media.istockphoto.com/id/886702374/vector/no-cell-phones-use-crossed-out-sign-smartphone-icon-in-red-circle-vector.jpg?s=612x612&w=0&k=20&c=mUIuUQ-yJj7gJe8uHBwdhTnTXkQVkjpkKOJ-ynyBLIg=" alt="No Phone" class="mobile-warning-img">
+  <h1>Access Restricted</h1>
+  <p>For the best experience, please access this website from a PC or Laptop. Mobile devices are currently not supported.</p>
+</div>
+  <header class="site-header" style="display:flex;align-items:center;gap:10px;padding:10px 20px;background:#fff;border-bottom:1px solid #e0e0e0;">
+  <img class="header-logo" src="https://png.pngtree.com/png-vector/20241218/ourmid/pngtree-golden-lion-gaming-logo-png-image_14809629.png"
+     alt="NexCreat Logo"
+     style="width:45px;height:45px;border-radius:50%;object-fit:cover;">
+  <strong class="header-title">NEXCREAT</strong>
+  <nav class="top-nav" style="margin-left:auto;">
+    <a style="color:#000;" onclick="show('home')">Home</a>
+    <a style="color:#000;" onclick="show('info')">Info</a>
+    <a style="color:#000;" onclick="show('help')">Help</a>
+    <a style="color:#000;" onclick="show('about')">About Us</a>
+    <a style="color:#000;" onclick="show('privacy')">Privacy</a>
+    <a style="color:#000;" onclick="show('terms')">Terms</a>
+  </nav>
+</header>
+
+<section id="welcome" class="welcome-section active no-white">
+
+  <h1>WELCOME TO OUR WEBSITE</h1>
+
+  <p>
+    Check if your channel is ready for a Creator Award — completely free
+  </p>
+
+  <a class="welcome-btn" onclick="show('home')">
+    See More
+  </a>
+<!-- Left paragraph box -->
+<div class="welcome-box-container">
+  <div class="welcome-box welcome-left">
+    <p>
+      NexCreat is built for serious creators who want clarity, not confusion.
+      From checking Creator Award eligibility to learning from trusted videos,
+       everything here is designed to support your YouTube growth journey.
+    </p>
+  </div>
+
+  <div class="welcome-box welcome-right">
+    <p>
+      No logins. No payments. No false promises.
+      Just simple, transparent tools and resources that help creators
+      understand where they stand — and what to do next, and became a
+                            Succesful Creator !
+    </p>
+  </div>
+</div>
+
+</section>
+
+<!-- HOME PAGE (Original) -->
+<section id="home">
+<h1 class="page-title no-red-box">How to get YouTube Creator Award ?</h1>
+
+  <!-- Original Home Thumbnails Row -->
+  <div class="thumbnails-row">
+    <a href="https://www.youtube.com/watch?v=P1tj-w4lBjs" target="_blank">
+      <img class="clickable-video" src="https://img.youtube.com/vi/P1tj-w4lBjs/maxresdefault.jpg" alt="Thumbnail 1">
+    </a>
+    <img class="clickable-video" src="https://p.turbosquid.com/ts-thumb/Pl/QejagN/Tuc2Q1Qk/button_01/jpg/1592083540/1920x1080/fit_q87/8deba28cb13ec93a0fffd8872a45a2a099a0b3b9/button_01.jpg" alt="Thumbnail 2">
+  </div>
+  
+  <p class="sub" style="color:#000; font-weight:700;">
+  YouTube Creator Awards are our way of recognizing the extraordinary effort creators put into their growing channels and to build thriving communities, responsibly. To be eligible for a Creator Award, creators need to meet the eligibility criteria and must follow our policies.
+</p>
+
+<p class="sub" style="color:#000; font-weight:700;">
+  Subscribe to the YouTube Creators channel for the latest news, updates, and tips. New Size. Same Reward. More creators than ever before are achieving impressive milestones on YouTube and seeing their passion pay off with Creator Awards.
+</p>
+
+<p class="sub" style="color:#000; font-weight:700;">
+  Starting in August 2024, we are introducing a new, lighter sized award. Don’t worry, the quality and design is staying the same, along with the prestige and recognition you deserve.
+</p>
+
+<p class="sub" style="color:#000; font-weight:700;">
+  Find out if your channel is eligible for a YouTube Creator Award, and get your award redemption code .
+</p>
+
+  <h2>Eligibility Criteria</h2>
+  <ul>
+    <li>Pass a specific subscriber milestone:
+      <ul>
+        <li>Silver: 100,000 subscribers</li>
+        <li>Gold: 1,000,000 subscribers</li>
+        <li>Diamond: 10,000,000 subscribers</li>
+        <li>Red Diamond: 100,000,000 subscribers</li>
+      </ul>
+    </li>
+    <li>Channel active within last 6 months</li>
+    <li>No active Community Guidelines violation in last 365 days</li>
+    <li>Compliance with YouTube Terms of Service</li>
+    <li>No rejection/suspension from YouTube Partner Program</li>
+    <li>Channel not terminated or linked to terminated account</li>
+    <li>No deceptive, spammy, or scam content</li>
+    <li>Main content must be original</li>
+    <li>Awards are personal use only; violation may lead to disciplinary action</li>
+  </ul>
+</div>
+<h1 class="page-title no-red-box">YouTube Creator Award Checker</h1>
+
+<p class="sub">
+Answer the following questions honestly to check your eligibility for a YouTube Creator Award.
+</p>
+
+<form id="checkerForm">
+
+  <div class="question">
+    <p>1. Has your channel crossed the required subscriber milestone (100K / 1M / 10M / 100M)?</p>
+    <label>
+  <input type="radio" name="q1" value="yes"><span>Yes</span>
+</label>
+<label>
+  <input type="radio" name="q1" value="no"><span>No</span>
+</label>
+  </div>
+
+  <div class="question">
+    <p>2. Were your subscribers gained organically without buying or artificial growth?</p>
+    <label>
+  <input type="radio" name="q2" value="yes"><span>Yes</span>
+</label>
+<label>
+  <input type="radio" name="q2" value="no"><span>No</span>
+</label>
+  </div>
+
+  <div class="question">
+    <p>3. Has your channel been active within the last 6 months?</p>
+    <label>
+  <input type="radio" name="q3" value="yes"><span>Yes</span>
+</label>
+<label>
+  <input type="radio" name="q3" value="no"><span>No</span>
+</label>
+  </div>
+
+  <div class="question">
+    <p>4. Does your channel currently have zero active Community Guidelines strikes?</p>
+   <label>
+  <input type="radio" name="q4" value="yes"><span>Yes</span>
+</label>
+<label>
+  <input type="radio" name="q4" value="no"><span>No</span>
+</label>
+  </div>
+
+  <div class="question">
+    <p>5. Has your channel avoided serious or repeated policy violations in the last 12 months?</p>
+    <label>
+  <input type="radio" name="q5" value="yes"><span>Yes</span>
+</label>
+<label>
+  <input type="radio" name="q5" value="no"><span>No</span>
+</label>
+  </div>
+
+  <div class="question">
+    <p>6. Is your channel approved for or eligible for the YouTube Partner Program?</p>
+    <label>
+  <input type="radio" name="q6" value="yes"><span>Yes</span>
+</label>
+<label>
+  <input type="radio" name="q6" value="no"><span>No</span>
+</label>
+  </div>
+
+  <div class="question">
+    <p>7. Is the majority of your content original or significantly transformed?</p>
+    <label>
+  <input type="radio" name="q7" value="yes"><span>Yes</span>
+</label>
+<label>
+  <input type="radio" name="q7" value="no"><span>No</span>
+</label>
+  </div>
+
+  <div class="question">
+    <p>8. Does your channel have no unresolved copyright strikes?</p>
+    <label>
+  <input type="radio" name="q8" value="yes"><span>Yes</span>
+</label>
+<label>
+  <input type="radio" name="q8" value="no"><span>No</span>
+</label>
+  </div>
+
+  <div class="question">
+    <p>9. Do you fully own and control this YouTube channel?</p>
+    <label>
+  <input type="radio" name="q9" value="yes"><span>Yes</span>
+</label>
+<label>
+  <input type="radio" name="q9" value="no"><span>No</span>
+</label>
+  </div>
+
+  <div class="question">
+    <p>10. Has your channel avoided spam, misleading metadata, or deceptive practices?</p>
+    <label>
+    <input type="radio" name="q10" value="yes"><span>Yes</span>
+    </label>
+    <label>
+    <input type="radio" name="q10" value="no"><span>No</span>
+    </label>
+  </div>
+
+  <div class="question">
+    <p>11. Is your channel not linked to any terminated or banned YouTube account?</p>
+    <label>
+    <input type="radio" name="q11" value="yes"><span>Yes</span>
+    </label>
+    <label>
+    <input type="radio" name="q11" value="no"><span>No</span>
+    </label>
+    </div>
+
+  <div class="question">
+    <p>12. Do you agree that the Creator Award is for personal display only?</p>
+   <label>
+   <input type="radio" name="q12" value="yes"><span>Yes</span>
+   </label>
+   <label>
+   <input type="radio" name="q12" value="no"><span>No</span>
+   </label>
+  </div>
+
+  <button type="button" onclick="checkEligibility()">Check Result</button>
+
+</form>
+
+<div class="result" id="finalResult" style="display:none;">
+  <p class="message-text" id="resultText"></p>
+  <p class="sub">
+    This result is based on self-reported information. Final approval is done by YouTube.
+  </p>
+</div>
+</section>
+
+<!-- INFO / LAST PAGE -->
+<section id="info">
+  <h2 class="page-title">YouTube Creator Awards Information</h2>
+  
+  <h3>Country/Region Availability</h3>
+  <p>
+The YouTube Creator Awards program is unavailable for channels in the following countries/regions: 
+Belarus (BY), Cuba (CU), Iran (IR), Myanmar (MM), North Korea (KP), Russia (RU), Somalia (SO), Sudan (SD), Syria (SY), Tajikistan (TJ), Vanuatu (VU), Venezuela (VE), Yemen (YE).
+  </p>
+  <img src="https://tii.imgix.net/production/articles/13707/5e9dc221-24df-40c0-9dff-8a5575fb0e1f-gW5ooF.png?auto=compress&fit=crop&auto=format" 
+       alt="Creator Award Example" 
+       class="info-image">
+
+  <h3>Redeem a YouTube Creator Award</h3>
+  <p>
+Once you’ve met our award criteria, we will send you a redemption code. Follow these steps to redeem your award:
+  </p>
+<div class="image-crop-right">
+  <img src="https://buyfollowers.com/wp-content/uploads/2024/02/how-to-receive-redemption-code.jpg" alt="YouTube Award Steps">
+</div>
+
+  <ul>
+    <li>Find and copy the redemption code we sent you.</li>
+    <li>If you’ve misplaced that redemption code, visit our interactive eligibility check to get your redemption code.</li>
+    <li>Go to the Creator Awards redemption website and enter your code.</li>
+    <li>Enter your shipping info and specify how you want your channel name to appear on the award.</li>
+    <li>Select “Order Now” to finish redeeming your award.</li>
+    <li>If you’re located in Bangladesh, Brazil, India, Indonesia, Mexico, Saudi Arabia, South Korea, Turkey, and Vietnam, you’ll be asked for extra info such as a tax ID when redeeming your Creator Award. The relevant customs offices require this info.</li>
+  </ul>
+
+  <h3>Shipping & Delivery</h3>
+<div class="image-crop-right">
+      <img src="https://thumbs.dreamstime.com/b/delivery-truck-icon-clipart-animated-cartoon-vector-illustration-van-isolated-white-background-yellow-cargo-auto-flat-256516084.jpg" alt="Delivery Truck">
+    </div>
+  <p>
+After you submit your shipping info and redeem your award, we’ll deliver it to you within approx. 2-3 weeks. Orders placed after June 1, 2023, can be tracked. To make sure your award gets to you on time, note the following:
+  </p>
+  <ul>
+    <li>Don’t forget to use your full legal name when submitting shipping info. This helps in case you have to pick it up from a customs or delivery office.</li>
+    <li>You’ll get an automated email from the shipping company containing a tracking number once your award has shipped. Sign up for tracking notifications to ensure your award reaches you successfully.</li>
+    <li>You’re responsible to get back to any contact made by a delivery company that requests more documentation or info from you. This may help your award pass through customs or be delivered to you.</li>
+    <li>You’re responsible to pay any customs duties and/or taxes that are required in certain countries/regions. Legally, YouTube can’t cover these costs. These countries include, but are not limited to: Armenia, Azerbaijan, Cambodia, Kyrgyzstan, and Uzbekistan.</li>
+    <li>If you don’t get back to a delivery company, your Creator Award may be returned or lost. In these cases, you may have to purchase a replacement if you want to get your Creator Award.</li>
+    <li>Once received, you have seven days to report any damage to Society Awards by submitting documentation. You will need to send photos of the award and the box, so please keep all packaging materials. This will also allow you to return the award to the vendor for a replacement. This will only be granted once the original award is returned and evaluated.</li>
+  </ul>
+</section>
+
+<!-- HELP PAGE (6 Videos) -->
+<section id="help">
+  <h2 class="page-title">YouTube Tutorial & Videos</h2>
+  <p class="sub">
+    Learn from these helpful videos about YouTube growth and tips. (CREDIT :- Manoj DEY)
+  </p>
+
+    <div class="thumbnails-row">
+    <!-- Video 1 -->
+    <!-- Video 1 -->
+    <a href="https://youtu.be/Cx-B1vPfhds?si=LSoQK4IuvlCoYE30" target="_blank">
+    <img class="clickable-video" src="https://i.ytimg.com/vi/Cx-B1vPfhds/maxresdefault.jpg" alt="Video 1">
+    </a>
+    <!-- Video 2 -->
+    <a href="https://youtu.be/0oO5cN2f2g8?si=p7YuAnzRLnzNqc1h" target="_blank">
+      <img class="clickable-video" src="https://i.ytimg.com/vi/0oO5cN2f2g8/maxresdefault.jpg" alt="Video 2">
+    </a>
+    <!-- Video 3 -->
+    <a href="https://youtu.be/PGPp9UUMlpI?si=EC9iTk29NzXwxHaJ" target="_blank">
+      <img class="clickable-video" src="https://i.ytimg.com/vi/PGPp9UUMlpI/maxresdefault.jpg" alt="Video 3">
+    </a>
+    <!-- Video 4 -->
+    <a href="https://youtu.be/BkoXYYCBme4?si=rYg_4cXA6AJoRWqs" target="_blank">
+      <img class="clickable-video" src="https://i.ytimg.com/vi/BkoXYYCBme4/maxresdefault.jpg" alt="Video 4">
+    </a>
+    <!-- Video 5 -->
+    <a href="https://youtu.be/VV32rwnZEbU?si=u5-2xPB1U2JdTJx-" target="_blank">
+      <img class="clickable-video" src="https://i.ytimg.com/vi/VV32rwnZEbU/maxresdefault.jpg" alt="Video 5">
+    </a>
+    <!-- Video 6 -->
+    <a href="https://youtu.be/DMcQqA8ldo8?si=0YNlqUXq5ZzlP_G1" target="_blank">
+      <img class="clickable-video" src="https://i.ytimg.com/vi/DMcQqA8ldo8/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLA1VXt1rnbeiP4PEE4CKx186B0-dA" alt="Video 6">
+    </a>
+  </div>
+<div class="thumbnails-row">
+  <!-- 6 videos here -->
+</div>
+<div class="creator-help-contact">
+  <h3>Need help with your YouTube channel?</h3>
+  <p>
+    If you’re facing any issues related to your YouTube channel or Creator Awards,
+    feel free to reach out to us. We’ll try our best to guide you with accurate and helpful information.
+  </p>
+
+  <div class="contact-details">
+    <p>📧 <strong>Email:</strong> anmoljha831@gmail.com</p>
+    <p>📸 <strong>Instagram:</strong> @nexcreat_official</p>
+  </div>
+</section>
+<section id="about" class="page">
+  <div class="about-wrap">
+
+    <h2 class="page-title">About NEXCREAT</h2>
+
+    <p>
+      <strong>NEXCREAT</strong> is an independent, creator-focused informational platform built to support
+      YouTube creators at every stage of their journey. Our goal is to simplify complex
+      YouTube policies, eligibility systems, and creator milestones into clear,
+      easy-to-understand tools and resources. NEXCREAT helps creators evaluate their
+      progress, understand Creator Award eligibility through self-assessment, and learn
+      from reliable educational content — without false promises, paid traps, or
+      misleading guarantees.
+    </p>
+
+    <p>
+      The platform is designed with transparency and responsibility in mind. NEXCREAT
+      does not require user registration, does not collect personal data, and does not
+      claim any official affiliation with Google or YouTube. All information provided
+      is based on publicly available guidelines and is intended purely for educational
+      and self-evaluation purposes. Final decisions regarding Creator Awards,
+      monetization, or eligibility are always made by YouTube itself.
+    </p>
+
+    <h3>Trust, Transparency &amp; Purpose</h3>
+
+    <p>
+      At NEXCREAT, we understand that many creators struggle due to confusion, fake
+      claims, and unclear guidance found online. Our mission is to eliminate that
+      confusion by offering honest, simple, and creator-first tools that focus on
+      clarity rather than hype. Whether you are a beginner or an experienced creator,
+      NEXCREAT aims to be a reliable companion in your YouTube growth journey.
+    </p>
+
+    <h3>Future Updates &amp; Upcoming Features</h3>
+
+    <p>
+      NEXCREAT is continuously evolving. In future updates, we plan to introduce
+      powerful tools such as a smart tag generator for videos and Shorts, online
+      Creator Award customization previews, and advanced premium features for creators
+      who want deeper insights and professional-level utilities.
+    </p>
+
+    <p>
+      Our vision is to build NEXCREAT into a complete, trusted ecosystem where creators
+      can learn, evaluate, and grow — all in one place.
+    </p>
+
+  </div>
+</section>
+<section id="privacy" class="page">
+  <div class="about-wrap">
+<h1>Privacy Policy</h1>
+<p>
+At NEXCREAT, we respect and value the privacy of every visitor and user.
+This Privacy Policy document explains what type of information is collected
+and recorded by NEXCREAT and how we use it. By using our website, you agree
+to the terms described in this Privacy Policy.
+</p>
+
+<p>
+NEXCREAT does not require users to create an account or provide personal
+information such as name, email address, phone number, or location in order
+to access most of the content and tools available on the website. We do not
+knowingly collect any personally identifiable information from users.
+</p>
+
+<p>
+Our website may include tools, checkers, informational content, and external
+links related to YouTube and creator resources. Any data entered into tools
+(such as eligibility checkers) is processed locally in the browser and is not
+stored, saved, or shared with us or any third party.
+</p>
+
+<p>
+NEXCREAT may contain links to third-party websites such as YouTube, Google,
+or other platforms. Please note that these external sites have their own
+privacy policies, and we do not have control over their content or practices.
+We strongly advise users to review the privacy policies of those websites
+before engaging with them.
+</p>
+
+<p>
+We may use basic cookies or browser storage in the future to improve user
+experience, website performance, or analytics. These cookies do not contain
+any personal information and are used only for functional or performance
+purposes.
+</p>
+
+<p>
+NEXCREAT does not sell, trade, or rent users’ personal information to others.
+We also do not share any personal data with advertisers or marketing partners.
+If advertisements are displayed on the website, they may be served by
+third-party ad networks such as Google AdSense, which may use cookies in
+accordance with their own privacy policies.
+</p>
+
+<p>
+This Privacy Policy may be updated from time to time. Any changes will be
+posted on this page with an updated revision date. Continued use of the
+website after changes are made will be considered acceptance of the updated
+policy.
+</p>
+
+<p>
+For any questions, concerns, or inquiries related to this website,
+please contact us at:
+<br><br>
+<strong>Email:</strong> k.anmoljha2.0@gmail.com
+<br><br>
+We aim to respond to all inquiries as soon as possible.
+</p>
+</div>
+</section>
+<section id="terms" class="page">
+  <div class="about-wrap">
+<h1>Terms & Conditions</h1>
+
+<p>
+Welcome to NEXCREAT. By accessing or using this website, you agree to comply
+with and be bound by the following Terms and Conditions. If you do not agree
+with any part of these terms, please do not use the website.
+</p>
+
+<p>
+NEXCREAT is an informational and educational platform designed to helpF
+YouTube creators understand eligibility criteria, policies, milestones, and
+general guidance related to YouTube growth, monetization, and creator awards.
+All tools and information provided on this website are for guidance purposes
+only.
+</p>
+
+<p>
+We do not guarantee the accuracy, completeness, or reliability of any results
+generated by our tools or checkers. Actual eligibility or outcomes may vary
+based on official YouTube policies, which are controlled entirely by YouTube
+and Google.
+</p>
+
+<p>
+Users are responsible for how they use the information provided on this
+website. NEXCREAT will not be held liable for any losses, damages, or issues
+arising from the use of our tools, content, or external links.
+</p>
+
+<p>
+All content on this website, including text, design, layout, branding, and
+tools, is the intellectual property of NEXCREAT unless otherwise stated.
+Unauthorized copying, reproduction, modification, or redistribution of any
+content without permission is strictly prohibited.
+</p>
+
+<p>
+The website may include references to third-party creators, platforms, or
+brands for informational purposes only. We are not officially affiliated
+with YouTube, Google, or any creator unless explicitly stated.
+</p>
+
+<p>
+We reserve the right to modify, suspend, or discontinue any part of the
+website at any time without prior notice. We also reserve the right to update
+these Terms & Conditions at our discretion.
+</p>
+
+<p>
+By continuing to use this website, you acknowledge that you have read,
+understood, and agreed to these Terms & Conditions in full.
+</p>
+</div>
+</section>
+<footer style="color:#000;">
+  Independent informational tool. Not affiliated with Google or YouTube.
+</footer>
+<script>
+function show(id){
+
+  // hide all pages
+  document.querySelectorAll("section").forEach(s=>{
+    s.classList.remove("active");
+  });
+
+  const page = document.getElementById(id);
+
+  page.classList.add("active");
+
+  // welcome page footer logic
+  if(id === "welcome"){
+    document.body.classList.add("welcome-active");
+  } else {
+    document.body.classList.remove("welcome-active");
+  }
+}
+
+function checkEligibility(){
+  const total = 12;
+  let noCount = 0;
+
+  for(let i=1;i<=12;i++){
+    const ans = document.querySelector(`input[name="q${i}"]:checked`);
+    if(!ans){ alert("Please answer all questions"); return; }
+    if(ans.value === "no") noCount++;
+  }
+
+  const result = document.getElementById("finalResult");
+  const text = document.getElementById("resultText");
+
+  if(noCount === 0){
+    text.innerHTML = "🎉 Eligible for YouTube Creator Award (Self-Assessment)";
+  } else if(noCount <= 2){
+    text.innerHTML = "⚠️ Manual Review Required. Your channel may need further verification.";
+  } else {
+    text.innerHTML = "❌ Not Eligible for Creator Award at this time.";
+  }
+
+  result.style.display = "block";
+}
+
+// page load par welcome active rahe
+document.body.classList.add("welcome-active");
+
+function openPolicy(id){
+  document.getElementById(id).style.display = "block";
+}
+
+function closePolicy(){
+  document.querySelectorAll('.policy-page').forEach(p=>{
+    p.style.display="none";
+  });
+}
+  // Detect mobile / tablet devices
+  if (window.innerWidth <= 900) { // width <= 900px → mobile/tablet
+    const warning = document.getElementById('mobile-warning');
+    warning.style.display = 'flex';
+    warning.style.flexDirection = 'column';
+    warning.style.justifyContent = 'center';
+    warning.style.alignItems = 'center';
+  }
+function isMobile() {
+    return /Android|iPhone|iPad|iPod|BlackBerry|Windows Phone/i.test(navigator.userAgent);
+}
+
+window.addEventListener('load', function() {
+    if(isMobile()) {
+        // Show mobile warning
+        document.getElementById('mobile-warning').style.display = 'flex';
+        // Disable background scroll
+        document.body.style.overflow = 'hidden';
+    } else {
+        // PC/Laptop: hide warning
+        document.getElementById('mobile-warning').style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+
+  if (window.innerWidth <= 768) {
+    document.body.style.overflow = "hidden";
+    document.getElementById("mobile-warning").style.display = "flex";
+  }
+});
+</script>
+</body>
+</html>
