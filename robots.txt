@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://kanmoljha20-spec.github.io/NEXCREAT/sitemap.xml
